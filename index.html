@@ -12,6 +12,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<!-- ใส่ URL ของ Cloudflare Worker (เช่น https://structcheck-ai.ชื่อบัญชี.workers.dev) เพื่อให้ตรวจแบบได้นอก Claude -->
+<meta name="ai-endpoint" content="">
 <script src="assets/claude-shim.js"></script>
 <style>
 :root{--bg:#F4F7FB;--card:#fff;--ink:#12233F;--mut:#56657D;--line:#C9D3E2;--blue:#1F4E9C;--on:#fff;--grid:#E8EEF6;--pass:#17703F;--pass-t:#E3F3EA;--warn:#8A5A00;--warn-t:#FBF0D9;--fail:#B3261E;--fail-t:#FBE5E3;--unk:#56657D;--unk-t:#E9EDF3;--gold:#F5B700;--band1:#0B2147;--band2:#1B4592;--lw:#C4D8FF;--sh:0 1px 2px rgba(11,33,71,.08),0 10px 26px rgba(11,33,71,.09);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -513,12 +515,50 @@ async function dxfRead(f){
  return `ชั้นข้อมูล (layer): ${[...layers].slice(0,60).join(', ')}\nจำนวนองค์ประกอบ: ${JSON.stringify(cnt).slice(0,500)}\nข้อความในแบบ: ${texts.join(' | ').slice(0,5000)}`;
 }
 
+/* ===== ตัวเรียก AI: ใช้ Claude runtime ถ้ามี ไม่มีก็เรียกผ่าน Worker ===== */
+const AI_ENDPOINT=((document.querySelector('meta[name="ai-endpoint"]')||{}).content||'').trim();
+const blobB64=b=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(',')[1]);r.onerror=()=>rej(new Error('อ่านรูปไม่สำเร็จ'));r.readAsDataURL(b)});
+async function shrink(b,maxSide=1800){ // ลดขนาดรูปก่อนส่ง (API รับรูปไม่เกิน 5 MB ต่อรูป)
+ try{
+  const bmp=await createImageBitmap(b),k=Math.min(1,maxSide/Math.max(bmp.width,bmp.height));
+  const c=document.createElement('canvas');c.width=Math.round(bmp.width*k);c.height=Math.round(bmp.height*k);
+  const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(bmp,0,0,c.width,c.height);
+  return await new Promise(r=>c.toBlob(r,'image/jpeg',.85))||b;
+ }catch(e){return b}
+}
+function parseAiJson(s){
+ s=String(s||'').replace(/```json|```/g,'').trim();
+ try{return JSON.parse(s)}catch(e){}
+ const a=s.indexOf('{'),z=s.lastIndexOf('}');
+ if(a>=0&&z>a)try{return JSON.parse(s.slice(a,z+1))}catch(e){}
+ throw new Error('AI ตอบกลับในรูปแบบที่อ่านไม่ได้');
+}
+function workerSampler(){
+ return{
+  limits:async()=>({images:{maxCount:6}}),
+  json:async(prompt,opt)=>{
+   const images=[];
+   for(const b of(opt&&opt.images)||[]){const s=await shrink(b);images.push({media_type:s.type||'image/jpeg',data:await blobB64(s)})}
+   let res;
+   try{res=await fetch(AI_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt,images})})}
+   catch(e){throw new Error('เชื่อมต่อเซิร์ฟเวอร์ AI ไม่ได้')}
+   const j=await res.json().catch(()=>({}));
+   if(!res.ok){const er=new Error((j.error&&j.error.message)||('เซิร์ฟเวอร์ตอบ HTTP '+res.status));er.code=j.error&&j.error.code;throw er}
+   return parseAiJson(j.text);
+  }
+ };
+}
+async function getSampler(){
+ try{if(window.claude&&claude.use){const s=await claude.use('sample');if(s)return s}}catch(e){}
+ return AI_ENDPOINT?workerSampler():null;
+}
+
 $('#go').onclick=async()=>{
  if(!file)return;
  const btn=$('#go');btn.disabled=true;btn.classList.add('busy');msg('กำลังอ่านไฟล์…');
  try{
-  const sample=await claude.use('sample');
-  if(!sample)throw new Error('ฟีเจอร์ AI ใช้ไม่ได้ในมุมมองนี้ ลองเปิดหน้านี้จากบัญชี Claude ของคุณ');
+  const sample=await getSampler();
+  if(!sample)throw new Error('ยังไม่ได้ตั้งค่าเซิร์ฟเวอร์ AI (meta ai-endpoint) หรือเปิดหน้านี้จากบัญชี Claude ของคุณ');
   const lim=await sample.limits().catch(()=>null),max=lim?.images?.maxCount||0;
   const ext=file.name.split('.').pop().toLowerCase();let imgs=[],extra='',pages=1;
   if(ext==='pdf'){const r=await pdfRead(file,Math.max(max,1));imgs=r.imgs;extra='ข้อความที่ดึงจาก PDF:\n'+r.text;pages=r.pages}
@@ -561,10 +601,14 @@ function render(r,info){
  $('#res').hidden=false;$('#res').scrollIntoView({behavior:'smooth'});
 }
 $('#pr').onclick=()=>{try{window.print()}catch(e){msg('พิมพ์จากหน้านี้ไม่ได้ ให้ใช้ปุ่มบันทึกเป็นไฟล์ HTML แล้วเปิดไฟล์เพื่อพิมพ์',1)}};
-$('#dl').onclick=async()=>{try{const d=await claude.use('downloads');
- const css=document.querySelector('style').textContent;
- await d.save({filename:'structcheck-report.html',data:new Blob([`<!DOCTYPE html><html lang="th"><meta charset="utf-8"><title>รายงาน StructCheck AI</title><style>${css}</style><body><div class="wrap"><section class="blk"><article class="paper">${$('#report').innerHTML}</article></section></div>`],{type:'text/html'})})}catch(e){}};
-try{claude.use('downloads').then(d=>{if(d)$('#dl').hidden=false}).catch(()=>{})}catch(e){}
+$('#dl').onclick=async()=>{try{
+  const css=document.querySelector('style').textContent;
+  const blob=new Blob([`<!DOCTYPE html><html lang="th"><meta charset="utf-8"><title>รายงาน StructCheck AI</title><style>${css}</style><body><div class="wrap"><section class="blk"><article class="paper">${$('#report').innerHTML}</article></section></div>`],{type:'text/html'});
+  let d=null;try{if(window.claude&&claude.use)d=await claude.use('downloads')}catch(e){}
+  if(d){await d.save({filename:'structcheck-report.html',data:blob});return}
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='structcheck-report.html';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+ }catch(e){}};
+$('#dl').hidden=false;
 function setTheme(m,save,init){const h=document.documentElement;
  if(m!=='auto')h.setAttribute('data-theme',m);else if(!init)h.removeAttribute('data-theme');
  document.querySelectorAll('.seg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===m));
