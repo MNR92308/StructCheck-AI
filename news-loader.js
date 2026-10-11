@@ -33,7 +33,7 @@
     return `${m[1]}/${seg}`;                                              // หน้า project site: owner.github.io/repo/
   }
   const detectRepo = () => {
-    const meta = $('meta[name="github-repo"]');
+    const meta = $('meta[name="MNR92308-StructCheck-AI"]');
     return repoFrom(location.hostname, location.pathname, meta && meta.content);
   };
 
