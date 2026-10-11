@@ -1,4 +1,116 @@
 {
-  "meta": { "lastUpdated": null, "lastScanAt": null, "lastApproved": null, "model": null, "lastRun": null },
-  "items": []
+  "meta": {
+    "lastUpdated": "2026-10-11",
+    "lastScanAt": "2026-10-11T04:43:10.188Z",
+    "lastApproved": null,
+    "model": "apodex/apodex-1.1-mini:free",
+    "lastRun": {
+      "candidates": 30,
+      "added": 5
+    },
+    "seenIds": [
+      "df5b132e48e6",
+      "24a7b3c31ebf",
+      "6874a5575b04",
+      "ee7f43d6d7a6",
+      "93bcc59af8ee",
+      "25b773c0a4c5",
+      "2d9e5b3e2cc1",
+      "01f561d8e3e6",
+      "85a9e3594922",
+      "75f38bcd07ef",
+      "9fd6021226cd",
+      "c008dc4f0f92",
+      "2f0533e4db5b",
+      "551f0fc00f45",
+      "901ce3c351e2",
+      "78c845997656",
+      "a1887e389ff6",
+      "7b6309e94921",
+      "a83c94aa710d",
+      "1e45a3bf88b5",
+      "c0a0059eaa67",
+      "c175f1f34fae",
+      "7dc14497f604",
+      "fdfbcffc8b73",
+      "a9c39fe8c8e1",
+      "713be61a4f88",
+      "b8e2298e55b7",
+      "5d255841d288",
+      "39e6c7c82ac1",
+      "5c15074ab0ad"
+    ]
+  },
+  "items": [
+    {
+      "id": "df5b132e48e6",
+      "title": "มหาดไทย งัดกฎกระทรวงคุม Data Center แบ่ง 8 ประเภท รับลงทุนทะลัก - Thansettakij",
+      "url": "https://news.google.com/rss/articles/CBMiVkFVX3lxTE9XME9sNzdCdkJzQUdiQlhUTGdsazBBQkxRV2tiaGt6YkhDUXR2MzVXT1pBa08wX1B6Q0c2ZEFRdkpYaFM1LXJmUUhIbjNOUHhpYUtFQ1VB?oc=5",
+      "source": "Thansettakij",
+      "publishedAt": "2026-10-07T06:45:00.000Z",
+      "category": "กฎหมาย",
+      "summary": "มหาดไทยออกกฎกระทรวงควบคุม Data Center แบ่งเป็น 8 ประเภท เพื่อดึงดูดการลงทุน",
+      "impact": "ผู้ยื่นขออนุญาตก่อสร้างต้องปฏิบัติตามกฎกระทรวงใหม่และแบ่งประเภทอาคารให้ถูกต้อง",
+      "confidence": 0.9,
+      "status": "pending",
+      "addedAt": "2026-10-11T04:43:10.174Z",
+      "aiModel": "apodex/apodex-1.1-mini:free"
+    },
+    {
+      "id": "6874a5575b04",
+      "title": "รื้อระบบอนุมัติ-อนุญาต! ‘ปกรณ์’ กางแผนปฏิรูปกฎกระทรวงดันไทยเข้า OECD - bangkokbiznews",
+      "url": "https://news.google.com/rss/articles/CBMiXEFVX3lxTE9jOVFJNHpRQXdGLVBoTVgxZ2JZVkVMRDlqN1QzTlFSWGpfdjdzNWtSaXR6RzdfcE9fZzNvR0g3aG5iOUdJakszWE5sMHFFUjdEOGVaV0NNV3dqMXJ0?oc=5",
+      "source": "bangkokbiznews",
+      "publishedAt": "2026-10-01T13:05:55.000Z",
+      "category": "กฎหมาย",
+      "summary": "มีการรื้อระบบอนุมัติ-อนุญาต และมีการปฏิรูปกฎกระทรวงเพื่อผลักดันไทยเข้าสู่ OECD",
+      "impact": "อาจมีการเปลี่ยนแปลงขั้นตอนการขออนุญาตก่อสร้างในอนาคต",
+      "confidence": 0.7,
+      "status": "pending",
+      "addedAt": "2026-10-11T04:43:10.174Z",
+      "aiModel": "apodex/apodex-1.1-mini:free"
+    },
+    {
+      "id": "2d9e5b3e2cc1",
+      "title": "ราชกิจจา Digest ฉบับย่อย ฟังบ่อย เข้าใจรัฐ ตอน 107 : ติดโซลาร์เซลล์ให้ปลอดภัย! กฎหมายใหม่คุมเข้มฉลากแผงและอินเวอร์เตอร์ - ททบ. 5",
+      "url": "https://news.google.com/rss/articles/CBMi7gJBVV95cUxPWjYxbE54X2lRMDc0QUZBUEs2ZjVMeG9fYlpIT1Y1TDJTUUNfUjZKZENnaElmYTZZQ1lYM1oya0ZHUUtKdjVMUnRRbl9US2ZBR201SnVCb2RLdExldmxCa29xVlc5SDgzay1RUzBUZzB4czRlRTZCQl9wUnFIU2U0WFhJNXZFSVFZQzNBQW9QTVZlX1JNd2dEQW5fUVh2cWwyeUNpS0lCMEhxQnBPN2tHYWlITGtwWFFVaWthTWxsSWpmZkYtT01mTmtFYVMza3NmSDFITU9MM1A2NTVVbHFwell1ZG1qT2RUeDhSdzRGNkplb3BoTHZiaTFEeEIyc05YLWkyMmRIR2RRMVhRNEJSa3ZBemFadFpCMUFZRTlPbGtNWHRORERXOG5iREp1VFlKMWQwRnVPSE91NGE0anNUR1d6ZGc2c3piX3piRmVYNHpxcHlhT0xYOHQ2b2Z5TGdSRlZwUFBfZW53T1RzeGc?oc=5",
+      "source": "ททบ. 5",
+      "publishedAt": "2026-10-05T15:21:00.000Z",
+      "category": "กฎหมาย",
+      "summary": "กฎหมายใหม่ควบคุมเข้มงวดฉลากแผงโซลาร์เซลล์และอินเวอร์เตอร์เพื่อความปลอดภัย",
+      "impact": "การติดตั้งโซลาร์เซลล์ต้องใช้อุปกรณ์ที่ได้มาตรฐานและติดฉลากตามกฎหมาย",
+      "confidence": 0.8,
+      "status": "pending",
+      "addedAt": "2026-10-11T04:43:10.174Z",
+      "aiModel": "apodex/apodex-1.1-mini:free"
+    },
+    {
+      "id": "1e45a3bf88b5",
+      "title": "รื้อกฎหมายโรงแรม! เปิดทางที่พักยุคใหม่ ลดใบอนุญาต-ปลดล็อกเอสเอ็มอี - ข่าวสด",
+      "url": "https://news.google.com/rss/articles/CBMiXkFVX3lxTE41SzkyM1hfcHVKMmJRaEM0ODFlOXA3TEI5ZDJ3TndLVlUzWjlPaG96QVo3ekhYaDRGVEhKbmJqWUFJUVoyQlRsaGltT0Z2bHFKdEROclJpdnNGTzkzWUE?oc=5",
+      "source": "ข่าวสด",
+      "publishedAt": "2026-09-29T07:00:00.000Z",
+      "category": "กฎหมาย",
+      "summary": "มีการรื้อกฎหมายโรงแรม เปิดทางที่พักยุคใหม่ ลดใบอนุญาตและปลดล็อกเอสเอ็มอี",
+      "impact": "ผู้ยื่นขออนุญาตก่อสร้างโรงแรมอาจได้รับความสะดวกและลดขั้นตอนการขออนุญาต",
+      "confidence": 0.75,
+      "status": "pending",
+      "addedAt": "2026-10-11T04:43:10.174Z",
+      "aiModel": "apodex/apodex-1.1-mini:free"
+    },
+    {
+      "id": "fdfbcffc8b73",
+      "title": "วิกฤตซัพพลายอสังหาฯ ดิ่งยกแผง! กรมที่ดินกางสถิติใบอนุญาตชะลอตัว พร้อมขันน็อตเกณฑ์ต่างชาติถือครอง | การเงินธนาคาร - LINE TODAY",
+      "url": "https://news.google.com/rss/articles/CBMiVkFVX3lxTE5VRWpHRXdOSE4wOE9acGRNRlpHdFZmUk5ZM1RPUzZGdUMyaUxtOVQyLWQ4ZVRhb3AtdzFXOHhudm40VWh3ZzZFZXlzUXIzdlg3MGtWSmZB?oc=5",
+      "source": "LINE TODAY",
+      "publishedAt": "2026-10-03T09:59:03.000Z",
+      "category": "ข่าวทั่วไป",
+      "summary": "กรมที่ดินกางสถิติใบอนุญาตชะลอตัว พร้อมขันน็อตเกณฑ์ต่างชาติครอง",
+      "impact": "อาจส่งผลต่อกระบวนการขออนุญาตก่อสร้างสำหรับนักลงทุนต่างชาติ",
+      "confidence": 0.6,
+      "status": "pending",
+      "addedAt": "2026-10-11T04:43:10.174Z",
+      "aiModel": "apodex/apodex-1.1-mini:free"
+    }
+  ]
 }
