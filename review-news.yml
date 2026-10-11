@@ -1,0 +1,44 @@
+name: Review news item (human)
+
+on:
+  workflow_dispatch:
+    inputs:
+      ids:
+        description: 'id ของรายการ (คัดลอกจากหน้าเว็บ) คั่นหลายรายการด้วยเครื่องหมายจุลภาค'
+        required: true
+      decision:
+        description: 'ผลการตรวจทาน'
+        type: choice
+        options: [approved, rejected]
+        required: true
+      note:
+        description: 'หมายเหตุ เช่น เลขราชกิจจานุเบกษาที่ใช้เทียบ'
+        required: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: news-data
+  cancel-in-progress: false
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node scripts/review-news.mjs
+        env:
+          ITEM_IDS: ${{ inputs.ids }}
+          DECISION: ${{ inputs.decision }}
+          NOTE: ${{ inputs.note }}
+          REVIEWER: ${{ github.actor }}
+      - name: Commit
+        run: |
+          git config user.name "structcheck-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/news.json
+          git diff --cached --quiet || (git commit -m "review: ${{ inputs.decision }} by ${{ github.actor }}" && git push)
