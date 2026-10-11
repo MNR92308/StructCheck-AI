@@ -1,23 +1,33 @@
-name: Review news item (human)
+# ผู้ตรวจทาน (คนที่มีสิทธิ์เขียนใน repo) อนุมัติ/ปฏิเสธข่าวผ่านปุ่มบนเว็บ
+# ปุ่มบนเว็บจะพาไปหน้า Actions ของ workflow นี้ -> กด Run workflow -> วาง id -> เลือกผล
+# ไฟล์นี้ต้องอยู่ที่ .github/workflows/review-news.yml ใน branch หลัก (default branch) ไม่เช่นนั้นลิงก์จะขึ้น 404
+name: Review news
+run-name: "review ${{ inputs.decision }}: ${{ inputs.item_ids }}"
 
 on:
   workflow_dispatch:
     inputs:
-      ids:
-        description: 'id ของรายการ (คัดลอกจากหน้าเว็บ) คั่นหลายรายการด้วยเครื่องหมายจุลภาค'
+      item_ids:
+        description: "id ของรายการ (วางได้หลายรายการ คั่นด้วยเครื่องหมาย , )"
         required: true
+        type: string
       decision:
-        description: 'ผลการตรวจทาน'
-        type: choice
-        options: [approved, rejected]
+        description: "ผลการตรวจทาน"
         required: true
+        type: choice
+        options:
+          - approved
+          - rejected
       note:
-        description: 'หมายเหตุ เช่น เลขราชกิจจานุเบกษาที่ใช้เทียบ'
+        description: "หมายเหตุ (ไม่บังคับ)"
         required: false
+        type: string
+        default: ""
 
 permissions:
   contents: write
 
+# ใช้ชื่อกลุ่มเดียวกับ workflow ที่ดึงข่าว (fetch-news) เพื่อไม่ให้สองงานแก้ data/news.json พร้อมกัน
 concurrency:
   group: news-data
   cancel-in-progress: false
@@ -25,20 +35,41 @@ concurrency:
 jobs:
   review:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: node scripts/review-news.mjs
+
+      - name: บันทึกผลการตรวจทาน
         env:
-          ITEM_IDS: ${{ inputs.ids }}
+          ITEM_IDS: ${{ inputs.item_ids }}
           DECISION: ${{ inputs.decision }}
           NOTE: ${{ inputs.note }}
           REVIEWER: ${{ github.actor }}
-      - name: Commit
+        run: node scripts/review-news.mjs
+
+      - name: Commit และ push
+        env:
+          DECISION: ${{ inputs.decision }}
+          REVIEWER: ${{ github.actor }}
         run: |
-          git config user.name "structcheck-bot"
-          git config user.email "actions@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/news.json
-          git diff --cached --quiet || (git commit -m "review: ${{ inputs.decision }} by ${{ github.actor }}" && git push)
+          if git diff --cached --quiet; then
+            echo "ไม่มีการเปลี่ยนแปลง"
+            exit 0
+          fi
+          git commit -m "review: ${DECISION} by ${REVIEWER}"
+          for i in 1 2 3; do
+            if git pull --rebase origin "$GITHUB_REF_NAME" && git push origin "HEAD:$GITHUB_REF_NAME"; then
+              exit 0
+            fi
+            git rebase --abort 2>/dev/null || true
+            sleep 5
+          done
+          echo "push ไม่สำเร็จ" >&2
+          exit 1

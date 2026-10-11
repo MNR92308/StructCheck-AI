@@ -466,7 +466,7 @@ function drawAlerts(){
 }
 // สรุปจำนวนรายการ + หัวข้อล่าสุด แสดงที่หัวข้อและแถบประกาศด้านบน (นับจาก DOM จึงใช้ได้กับรายการที่ news-loader เติมเข้ามาด้วย)
 function drawAlertMeta(){
- const lis=[...document.querySelectorAll('#al > li')],n=lis.length,p=lis.filter(li=>li.querySelector('button[data-a]')).length;
+ const lis=[...document.querySelectorAll('#al > li')],n=lis.length,p=lis.filter(li=>li.querySelector('button[data-a],a[data-review],button[data-review]')).length;
  const c=$('#alc');if(c)c.textContent=n?(p?`${n} รายการ · รอตรวจทาน ${p}`:`${n} รายการ`):'';
  const f=document.querySelector('#al > li b, #al > li strong'),t=$('#annt');
  if(t)t.textContent=f&&f.textContent.trim()?f.textContent.trim():'AI คัดกรองข่าวและกฎหมายใหม่ ผู้ตรวจทานอนุมัติก่อนเข้าฐานข้อมูลเสมอ';
