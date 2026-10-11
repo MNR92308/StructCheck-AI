@@ -3,13 +3,17 @@ main = "worker.js"
 compatibility_date = "2025-01-01"
 
 [vars]
-# โดเมนของเว็บคุณ (ไม่ต้องมี / ท้าย และใส่เฉพาะ origin ไม่ใช่ path) คั่นหลายค่าด้วย ,
+# โดเมนของเว็บคุณ ใส่เฉพาะ origin (ไม่มี path ไม่มี / ท้าย) คั่นหลายค่าด้วย ,
 ALLOWED_ORIGINS = "https://ชื่อเจ้าของ.github.io"
-MODEL = "claude-sonnet-5-5"
+# โมเดลบน OpenRouter ต้องรองรับรูปภาพ (ดูที่ openrouter.ai/models เลือกตัวกรอง Input: Image)
+MODEL = "google/gemini-2.5-flash"
+# ไม่บังคับ
+# SITE_URL = "https://ชื่อเจ้าของ.github.io/ชื่อ-repo/"
 
-# จำกัดจำนวนครั้งต่อ IP (ไม่บังคับ แต่แนะนำ) ลบ 4 บรรทัดนี้ออกถ้าไม่ใช้
-[[unsafe.bindings]]
-name = "RATE_LIMITER"
-type = "ratelimit"
-namespace_id = "1001"
-simple = { limit = 10, period = 60 }
+# จำกัดจำนวนครั้งต่อ IP (ไม่บังคับ) ถ้าจะใช้ ให้เอา # หน้าบรรทัดออก
+# ถ้า deploy แล้ว error เรื่อง binding ให้ใส่ # กลับ แล้วไปตั้ง Rate limiting rule ใน Cloudflare Dashboard แทน
+# [[unsafe.bindings]]
+# name = "RATE_LIMITER"
+# type = "ratelimit"
+# namespace_id = "1001"
+# simple = { limit = 10, period = 60 }
