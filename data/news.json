@@ -2,7 +2,7 @@
   "meta": {
     "lastUpdated": "2026-10-11",
     "lastScanAt": "2026-10-11T04:43:10.188Z",
-    "lastApproved": null,
+    "lastApproved": "2026-10-11",
     "model": "apodex/apodex-1.1-mini:free",
     "lastRun": {
       "candidates": 30,
@@ -52,9 +52,12 @@
       "summary": "มหาดไทยออกกฎกระทรวงควบคุม Data Center แบ่งเป็น 8 ประเภท เพื่อดึงดูดการลงทุน",
       "impact": "ผู้ยื่นขออนุญาตก่อสร้างต้องปฏิบัติตามกฎกระทรวงใหม่และแบ่งประเภทอาคารให้ถูกต้อง",
       "confidence": 0.9,
-      "status": "pending",
+      "status": "approved",
       "addedAt": "2026-10-11T04:43:10.174Z",
-      "aiModel": "apodex/apodex-1.1-mini:free"
+      "aiModel": "apodex/apodex-1.1-mini:free",
+      "reviewedBy": "MNR92308",
+      "reviewedAt": "2026-10-11T06:12:46.280Z",
+      "reviewNote": ""
     },
     {
       "id": "6874a5575b04",
