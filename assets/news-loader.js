@@ -10,7 +10,7 @@
   // วันที่ที่แสดงเป็น "ฐานข้อมูลอัปเดตล่าสุด": 'lastApproved' = เปลี่ยนเมื่อมีการอนุมัติ, 'lastUpdated' = เปลี่ยนเมื่อสแกนข่าวสำเร็จ
   const DATE_SOURCE = 'lastApproved';
   const MAX_PENDING = 50;   // จำนวนรายการรอตรวจทานที่แสดงสูงสุด
-  const MAX_APPROVED = 10;  // จำนวนรายการที่อนุมัติแล้วที่แสดงสูงสุด
+  const MAX_APPROVED = 0;   // จำนวนรายการที่อนุมัติแล้วที่ยังแสดงในรายการ (0 = ซ่อนทันทีหลังอนุมัติ, ใส่เลขอื่นถ้าอยากให้เห็นย้อนหลัง)
   const ADD_APPROVED_TO_DB = true; // เพิ่มรายการ กฎหมาย/มาตรฐาน ที่อนุมัติแล้ว เข้า "ฐานข้อมูลอ้างอิง" ของหน้าเว็บ
 
   const $ = (s) => document.querySelector(s);
@@ -143,8 +143,10 @@
     const wfUrl = repo ? `https://github.com/${repo}/actions/workflows/${WORKFLOW_FILE}` : '';
     const pending = DATA.items.filter((i) => i && i.status === 'pending').sort(byAddedDesc).slice(0, MAX_PENDING);
     const approved = DATA.items.filter((i) => i && i.status === 'approved').sort(byReviewedDesc).slice(0, MAX_APPROVED);
-    list.innerHTML = [...pending, ...approved].map((it) => itemHtml(it, wfUrl)).join('') ||
-      '<li><div><b>ยังไม่มีรายการข่าว</b><p>ระบบยังไม่เคยสแกนข่าวสำเร็จ ให้ไปที่แท็บ Actions ของ repo เลือก "Update news (AI)" แล้วกด Run workflow (ต้องตั้ง secret OPENROUTER_API_KEY ก่อน)</p></div></li>';
+    const empty = DATA.items.length
+      ? '<li><div><b>ไม่มีข่าวที่รอตรวจทาน</b><p>รายการที่อนุมัติแล้วจะถูกซ่อนจากรายการนี้ (รายการประเภทกฎหมาย/มาตรฐานถูกเพิ่มในฐานข้อมูลอ้างอิงแล้ว) ระบบจะสแกนข่าวใหม่ทุกวัน</p></div></li>'
+      : '<li><div><b>ยังไม่มีรายการข่าว</b><p>ระบบยังไม่เคยสแกนข่าวสำเร็จ ให้ไปที่แท็บ Actions ของ repo เลือก "Update news (AI)" แล้วกด Run workflow (ต้องตั้ง secret OPENROUTER_API_KEY ก่อน)</p></div></li>';
+    list.innerHTML = [...pending, ...approved].map((it) => itemHtml(it, wfUrl)).join('') || empty;
     renderHelp(repo, wfUrl);
     if (typeof drawAlertMeta === 'function') drawAlertMeta();
   };
