@@ -49,6 +49,10 @@
 .rvmeta a{color:var(--blue);text-decoration:none;font-weight:600}.rvmeta a:hover{text-decoration:underline}
 .rvmeta .chip{font-size:12.5px;padding:1px 10px}
 .al .impact{margin-top:6px;color:var(--ink)}
+.idchip{font:inherit;font-size:12.5px;padding:1px 10px;border:1px dashed var(--line);border-radius:999px;background:transparent;color:var(--mut);cursor:pointer}
+.idchip code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.95em;color:var(--ink)}
+.idchip:hover,.idchip:focus-visible{border-color:var(--blue);color:var(--blue)}
+.idchip.done{border-style:solid;border-color:var(--pass);color:var(--pass)}
 .rvhelp{margin:0 0 14px;padding:12px 16px;background:var(--card);border:1px solid var(--line);border-radius:14px;font-size:14.5px}
 .rvhelp summary{cursor:pointer;font-weight:600}
 .rvhelp ol{margin:8px 0 0;padding-left:22px;color:var(--mut)}
@@ -95,6 +99,7 @@
       it.publishedAt ? `<span>${esc(fmtDate(it.publishedAt))}</span>` : '',
       conf !== null ? `<span>AI มั่นใจ ${conf}%</span>` : '',
       url ? `<a href="${esc(url)}" target="_blank" rel="noopener noreferrer">เปิดข่าวต้นทาง ↗</a>` : '',
+      it.id ? `<button type="button" class="idchip" data-copyid="${esc(it.id)}" title="กดเพื่อคัดลอก id">ID: <code>${esc(it.id)}</code> · คัดลอก</button>` : '',
     ].filter(Boolean).join('');
 
     let actions;
@@ -125,7 +130,7 @@
       return;
     }
     box.innerHTML = `<details class="rvhelp"><summary>ผู้ตรวจทานทำอย่างไร</summary><ol>
-<li>กด "อนุมัติ" หรือ "ปฏิเสธ" ที่รายการ ระบบจะคัดลอก id ให้และเปิดหน้า GitHub Actions</li>
+<li>กด "อนุมัติ" หรือ "ปฏิเสธ" ที่รายการ ระบบจะคัดลอก id ให้และเปิดหน้า GitHub Actions (หรือกดที่ป้าย ID ของรายการเพื่อคัดลอกเอง)</li>
 <li>ล็อกอิน GitHub ด้วยบัญชีที่มีสิทธิ์เขียนใน repo แล้วกด <code>Run workflow</code></li>
 <li>วาง id ในช่อง <code>ids</code> เลือกผลใน <code>decision</code> ให้ตรงกับที่กด (<code>approved</code> หรือ <code>rejected</code>) แล้วกด <code>Run workflow</code> อีกครั้ง</li>
 <li>รอประมาณ 1 นาที แล้วรีเฟรชหน้านี้ รายการจะเปลี่ยนสถานะ</li></ol>
@@ -177,6 +182,18 @@
   }
 
   list.addEventListener('click', async (e) => {
+    const c = e.target.closest('button[data-copyid]');
+    if (c) {
+      const id = c.dataset.copyid;
+      const ok = await copyText(id);
+      toast(ok ? `คัดลอก id แล้ว: ${id}` : `คัดลอกอัตโนมัติไม่ได้ จด id นี้ไว้: ${id}`);
+      if (ok) {
+        const old = c.innerHTML;
+        c.classList.add('done'); c.innerHTML = 'คัดลอกแล้ว ✓';
+        setTimeout(() => { c.classList.remove('done'); c.innerHTML = old; }, 1800);
+      }
+      return;
+    }
     const a = e.target.closest('a[data-review]');
     if (!a) return;
     const id = a.dataset.id, decision = a.dataset.review;
