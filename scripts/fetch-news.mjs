@@ -11,6 +11,7 @@ const MODEL = process.env.OPENROUTER_MODEL || 'apodex/apodex-1.1-mini:free';
 const SITE = process.env.SITE_URL || 'https://github.com';
 // true = เปลี่ยนวันที่เฉพาะรอบที่พบข่าวใหม่ / false (ค่าเริ่มต้น) = เปลี่ยนทุกครั้งที่ AI ค้นสำเร็จ
 const DATE_ONLY_WHEN_NEW = process.env.DATE_ONLY_WHEN_NEW === 'true';
+const MAX_SEEN_IDS = 500; // จำจำนวน id ข่าวที่เคยส่งให้ AI ตรวจแล้ว (กันส่งซ้ำทุกรอบ)
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const sha = (s) => createHash('sha1').update(s).digest('hex').slice(0, 12);
@@ -86,6 +87,8 @@ async function callAI(messages) {
       },
       body: JSON.stringify({
         model: MODEL, messages, temperature: 0.2, max_tokens: 8000,
+        // โมเดล reasoning อาจใช้ token หมดไปกับการคิดจน content ว่าง งานคัดกรองนี้ไม่ต้องคิดยาว จึงปิดไว้
+        reasoning: { enabled: false },
         ...(useJson ? { response_format: { type: 'json_object' } } : {}),
       }),
       signal: AbortSignal.timeout(180000),
@@ -93,15 +96,25 @@ async function callAI(messages) {
     if (r.status === 400 && useJson) { useJson = false; continue; } // กันกรณีโมเดลไม่รองรับ json mode
     if (r.status === 429 || r.status >= 500) { await sleep(attempt * (process.env.RETRY_MS ? Number(process.env.RETRY_MS) : 15000)); continue; } // โควตาฟรีเต็ม/เซิร์ฟเวอร์ขัดข้อง
     if (!r.ok) throw new Error(`OpenRouter ${r.status}: ${(await r.text()).slice(0, 300)}`);
-    const text = (await r.json()).choices?.[0]?.message?.content;
-    if (!text) throw new Error('โมเดลไม่ส่งข้อความกลับมา');
-    return text;
+
+    const data = await r.json();
+    const choice = data.choices?.[0];
+    const text = choice?.message?.content?.trim();
+    if (text) return text;
+
+    // ตอบว่าง: log สาเหตุ (ไม่ log header/key) แล้วลองใหม่
+    console.warn(
+      `รอบ ${attempt}: ตอบว่าง finish_reason=${choice?.finish_reason ?? '-'} ` +
+      `error=${JSON.stringify(data.error ?? null)} ` +
+      `reasoning_chars=${String(choice?.message?.reasoning ?? '').length}`
+    );
+    await sleep(attempt * 5000);
   }
-  throw new Error('OpenRouter ไม่ตอบสนองหลังลองซ้ำ');
+  throw new Error('โมเดลไม่ส่งข้อความกลับมาหลังลองซ้ำ');
 }
 
 export function extractJson(text) {
-  const s = text.replace(/```(?:json)?/g, '');
+  const s = text.replace(/<think>[\s\S]*?<\/think>/g, '').replace(/```(?:json)?/g, '');
   const a = s.indexOf('{'), b = s.lastIndexOf('}');
   if (a < 0 || b < a) throw new Error('ไม่พบ JSON ในคำตอบของโมเดล');
   return JSON.parse(s.slice(a, b + 1));
@@ -137,10 +150,15 @@ export async function run({ dataPath = DATA_PATH, cfgPath = path.join(ROOT, 'scr
   if (!KEY) throw new Error('ไม่พบ OPENROUTER_API_KEY');
   const cfg = JSON.parse(await readFile(cfgPath, 'utf8'));
   const db = await loadDb(dataPath);
-  const known = new Set(db.items.map((i) => i.id)); // รวมรายการที่ถูกปฏิเสธ จะไม่ถูกเพิ่มซ้ำ
+  db.meta = db.meta || {};
+  const seenIds = Array.isArray(db.meta.seenIds) ? db.meta.seenIds : [];
+  // รวมรายการที่บันทึกแล้ว (รวมที่ถูกปฏิเสธ) และข่าวที่ AI เคยตรวจแล้วว่าไม่เกี่ยวข้อง จะไม่ถูกส่งซ้ำ
+  const known = new Set([...db.items.map((i) => i.id), ...seenIds]);
   const cands = (await collect(cfg)).filter((c) => !known.has(c.id)).slice(0, cfg.maxNewPerRun);
   const added = cands.length ? await classify(cands) : [];
   db.items = [...added, ...db.items].slice(0, cfg.keepItems);
+  // จำ id ที่เพิ่งตรวจ (อัปเดตหลัง classify สำเร็จเท่านั้น ถ้าพังก่อนหน้านี้ รอบหน้าจะลองใหม่)
+  db.meta.seenIds = [...new Set([...cands.map((c) => c.id), ...seenIds])].slice(0, MAX_SEEN_IDS);
   // ถึงบรรทัดนี้ได้ = ค้นข่าวและเรียก AI สำเร็จ จึงเปลี่ยนวันที่อัปเดต (ถ้าพังก่อนหน้านี้ ไฟล์จะไม่ถูกแตะ)
   if (added.length || !DATE_ONLY_WHEN_NEW) db.meta.lastUpdated = today();
   db.meta.lastScanAt = new Date().toISOString();
