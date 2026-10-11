@@ -1,6 +1,6 @@
 // โหลด data/news.json ที่ AI อัปเดต แล้วแสดงวันที่อัปเดตล่าสุดและรายการข่าวรอตรวจทาน
 (() => {
-  const REPO = 'MNR92308/StructCheck-AI'; // <-- แก้เป็นชื่อบัญชี/ชื่อ repo ของคุณ เช่น karan/structcheck-ai
+  const REPO = 'OWNER/REPO'; // <-- แก้เป็นชื่อบัญชี/ชื่อ repo ของคุณ เช่น karan/structcheck-ai
   const $ = (s) => document.querySelector(s);
   const thDate = (d) => d
     ? new Date(d + 'T00:00:00+07:00').toLocaleDateString('th-TH', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Bangkok' })
