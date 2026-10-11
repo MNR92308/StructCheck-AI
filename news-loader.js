@@ -25,7 +25,7 @@
   function repoFrom(host, pathname, metaContent) {
     const fromMeta = String(metaContent || '').trim()
       .replace(/^https?:\/\/github\.com\//i, '').replace(/\.git$/i, '').replace(/\/+$/, '');
-    if (/^[\w.-]+\/[\w.-]+$/.test(fromMeta)) return fromMeta;
+    if (/^[\w.-]+\/[\w.-]+$/.test(fromMeta) && !/^owner\/repo$/i.test(fromMeta)) return fromMeta; // ข้ามค่าตัวอย่าง OWNER/REPO
     const m = String(host).match(/^([a-z0-9-]+)\.github\.io$/i);
     if (!m) return null;
     const seg = String(pathname).split('/').filter(Boolean)[0];
