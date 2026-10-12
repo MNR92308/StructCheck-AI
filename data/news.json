@@ -2,7 +2,7 @@
   "meta": {
     "lastUpdated": "2026-10-12",
     "lastScanAt": "2026-10-12T00:30:12.941Z",
-    "lastApproved": "2026-10-11",
+    "lastApproved": "2026-10-12",
     "model": "apodex/apodex-1.1-mini:free",
     "lastRun": {
       "candidates": 8,
@@ -74,9 +74,12 @@
       "summary": "มีการเปิดใช้ 3 มาตรฐานใหม่สำหรับสถานดูแลผู้สูงอายุ และมีการสั่งให้ตรวจสอบเข้มงวดภายใน 2 เดือน",
       "impact": "ต้องปฏิบัติตามมาตรฐานใหม่ในการออกแบบและตรวจรับอาคารสถานดูแลผู้สูงอายุ",
       "confidence": 0.8,
-      "status": "pending",
+      "status": "approved",
       "addedAt": "2026-10-12T00:30:12.927Z",
-      "aiModel": "apodex/apodex-1.1-mini:free"
+      "aiModel": "apodex/apodex-1.1-mini:free",
+      "reviewedBy": "MNR92308",
+      "reviewedAt": "2026-10-12T14:57:06.034Z",
+      "reviewNote": ""
     },
     {
       "id": "df5b132e48e6",
