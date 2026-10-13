@@ -1,14 +1,24 @@
 {
   "meta": {
-    "lastUpdated": "2026-10-12",
-    "lastScanAt": "2026-10-12T00:30:12.941Z",
+    "lastUpdated": "2026-10-13",
+    "lastScanAt": "2026-10-13T00:31:30.736Z",
     "lastApproved": "2026-10-12",
     "model": "apodex/apodex-1.1-mini:free",
     "lastRun": {
-      "candidates": 8,
-      "added": 2
+      "candidates": 10,
+      "added": 0
     },
     "seenIds": [
+      "a1a7ff62b213",
+      "08b8121238db",
+      "6e8532d16ad6",
+      "bde4914cf570",
+      "8af983c0be4f",
+      "227b5284b535",
+      "53898a17b29a",
+      "c9a0c0be8cea",
+      "05a17e1ab02b",
+      "e81cf9acf442",
       "6ab4406f96dc",
       "cc5da9e3595d",
       "07060df1343a",
